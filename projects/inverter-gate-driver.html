@@ -57,7 +57,7 @@
       <p>Short-circuit protection uses the driver's desaturation (desat) detection, which reliably catches short-circuit events while still allowing high nominal currents through the switch. A blanking capacitor on the DESAT pin sets the blanking time after turn-on during which desat detection is disabled, preventing false triggers from the switch's own turn-on transient. The desat threshold voltage is programmable through the driver's configuration registers. On a desat event, the driver can respond with a normal shutdown, a controlled soft-shutdown, or a two-level turn-off, limiting di/dt stress and overvoltage on the inverter leg.</p>
       <div class="callout"><strong>Validation:</strong> desaturation protection was validated experimentally with an IGBT half-bridge in a double-pulse-test setup. With a 60V DC link and a 600µs gate pulse, collector current rose to ~130A; at that point the desat pin reached the configured 3.5V threshold, a fault was asserted, and the IGBT was shut down according to the driver's configured sequence — confirmed both by the measured pulse being shorter than the programmed 600µs, and by the driver's status registers reporting a desaturation fault.</div>
       <figure class="schematic-figure">
-        <img src="../assets/images/projects/gate-driver-desat-validation.jpg" alt="Oscilloscope capture of the desaturation protection test, showing collector current rising and an early shutdown triggered by the desat fault">
+        <img src="../assets/images/projects/gate-driver-desat-validation.png" alt="Oscilloscope capture of the desaturation protection test, showing collector current rising and an early shutdown triggered by the desat fault">
         <figcaption>Desat protection tripping a normal shutdown during the double-pulse test — the gate pulse is cut short as soon as the fault is asserted.</figcaption>
       </figure>
 
@@ -65,7 +65,7 @@
       <p>Overvoltage at turn-off — caused by stray inductance generating a voltage spike of L·(di/dt) on top of the DC link voltage — is clamped in hardware using a transient voltage suppressor (TVS) diode between the switch's collector and gate. When the collector-emitter voltage exceeds the TVS breakdown voltage, the diode conducts in reverse and injects current into the gate, partially turning the device back on and reducing di/dt, which clamps the overshoot.</p>
       <div class="callout"><strong>Validation:</strong> with a 100V DC link and a 100µs gate pulse, V<sub>CE</sub> overshot to 150V at turn-off. At that point the TVS entered breakdown, briefly increasing gate voltage and letting the IGBT conduct again, visibly reducing the overvoltage before the gate discharged and turn-off completed.</div>
       <figure class="schematic-figure">
-        <img src="../assets/images/projects/gate-driver-overvoltage-validation.jpg" alt="Oscilloscope capture of the overvoltage protection test, showing the collector-emitter voltage overshoot being clamped by the TVS diode at turn-off">
+        <img src="../assets/images/projects/gate-driver-overvoltage-validation.png" alt="Oscilloscope capture of the overvoltage protection test, showing the collector-emitter voltage overshoot being clamped by the TVS diode at turn-off">
         <figcaption>TVS active clamping in action: the gate briefly re-opens to tame the V<sub>CE</sub> overshoot at turn-off.</figcaption>
       </figure>
 
@@ -79,18 +79,26 @@
       <h3>PWM generation</h3>
       <p>Three pairs of complementary PWM outputs are generated using STM32's advanced timer in center-aligned mode at a fixed 16kHz, with hardware-enforced dead time between complementary signals. Duty-cycle modulation comes from DMA-driven updates out of a precomputed array of three 120°-phase-shifted sine waves, so all three phases update without any CPU involvement.</p>
       <figure class="schematic-figure">
-        <img src="../assets/images/projects/gate-driver-pwm-signals.jpg" alt="Oscilloscope capture of three-phase PWM signals with 120 degree phase separation, and complementary high-side/low-side duty cycle action">
-        <figcaption>Top: the three low-side PWM signals, 120° apart. Bottom: complementary high-side/low-side duty cycle action in one half-bridge — as the high-side duty cycle rises, the low-side falls.</figcaption>
+        <img src="../assets/images/projects/gate-driver-pwm-three-phase.png" alt="Oscilloscope capture of three low-side PWM signals with 120 degree phase separation">
+        <figcaption>The three low-side PWM signals, 120° apart.</figcaption>
       </figure>
       <figure class="schematic-figure">
-        <img src="../assets/images/projects/gate-driver-dead-time.jpg" alt="Oscilloscope capture showing the hardware dead time inserted between a high-side switch turning off and the complementary low-side switch turning on">
+        <img src="../assets/images/projects/gate-driver-pwm-complementary.png" alt="Oscilloscope capture of complementary high-side and low-side duty cycle action in one half-bridge">
+        <figcaption>Complementary high-side/low-side duty cycle action in one half-bridge — as the high-side duty cycle rises, the low-side falls.</figcaption>
+      </figure>
+      <figure class="schematic-figure">
+        <img src="../assets/images/projects/gate-driver-dead-time.png" alt="Oscilloscope capture showing the hardware dead time inserted between a high-side switch turning off and the complementary low-side switch turning on">
         <figcaption>The 500ns hardware dead time inserted by the PWM timer between a half-bridge's complementary gate signals.</figcaption>
       </figure>
       <h3>Fault reporting</h3>
       <p>When a fault is detected and not masked, an open-collector fault pin is pulled low, which activates the PWM timer's "Break" input and immediately aborts PWM generation in hardware. An ISR is triggered on the MCU side, and on the next main-loop iteration a driver status query goes out over SPI with the interpreted results printed over UART — giving a clear, human-readable fault description to anyone connected over a laptop.</p>
       <figure class="schematic-figure">
-        <img src="../assets/images/projects/gate-driver-fault-reporting.jpg" alt="Oscilloscope capture of the Break input immediately stopping PWM generation, alongside a UART terminal printout of a driver's interpreted status registers after a fault">
-        <figcaption>Top: the timer's Break input cutting PWM generation the instant a fault is asserted. Bottom: the resulting status printout over UART, decoded from the driver's registers.</figcaption>
+        <img src="../assets/images/projects/gate-driver-break-input.png" alt="Oscilloscope capture of the Break input immediately stopping PWM generation">
+        <figcaption>The timer's Break input cutting PWM generation the instant a fault is asserted.</figcaption>
+      </figure>
+      <figure class="schematic-figure">
+        <img src="../assets/images/projects/gate-driver-fault-printout.png" alt="UART terminal printout of a gate driver's interpreted status registers after a fault" style="max-width: 26rem; margin: 0 auto 1.5rem; display: block;">
+        <figcaption>The resulting status printout over UART, decoded from the driver's registers.</figcaption>
       </figure>
 
       <h2>Conclusion and future work</h2>
