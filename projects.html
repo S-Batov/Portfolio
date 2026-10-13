@@ -49,12 +49,63 @@
       -->
 
       <div class="projects-grid" id="projects-grid">
-        <!-- project cards go here -->
-      </div>
 
-      <div class="empty-state" id="empty-state">
-        <p><strong>No projects listed yet.</strong></p>
-        <p>Check back soon — this page is ready for the first write-up.</p>
+        <article class="project-card">
+          <img class="project-card__image" src="assets/images/projects/fesb-racing-efrt01.jpg" alt="FESB Racing team celebrating with the eFRT01 car at the Alpe Adria finish line">
+          <div class="project-card__body">
+            <h3 class="project-card__title">FESB Racing — eFRT01</h3>
+            <p class="project-card__desc">FESB Racing's electric Formula Student race car. Led the electronics team through design, integration, and testing of the vehicle's electronic systems — including the complete wiring harness and traction inverter configuration.</p>
+            <div class="project-card__tags">
+              <span class="tag">Formula Student</span>
+              <span class="tag">Electronics Lead</span>
+              <span class="tag">Wiring Harness</span>
+              <span class="tag">Traction Inverter</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <img class="project-card__image" src="assets/images/projects/vcu.jpg" alt="Assembled Vehicle Control Unit PCB with automotive connector">
+          <div class="project-card__body">
+            <h3 class="project-card__title">VCU — Vehicle Control Unit</h3>
+            <p class="project-card__desc">Central control PCB for the race car, built around an onboard MCU with dual CAN bus interfaces, an IMU, and 12V/5V digital and analog I/O. Designed the schematic and PCB layout in Altium and brought the board up from assembly through first power-on.</p>
+            <div class="project-card__tags">
+              <span class="tag">Altium Designer</span>
+              <span class="tag">PCB Design</span>
+              <span class="tag">CAN Bus</span>
+              <span class="tag">Hardware Bring-up</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <img class="project-card__image" src="assets/images/projects/inverter-gate-driver.png" alt="Oscilloscope capture of a double-pulse test showing switch current and voltage waveforms">
+          <div class="project-card__body">
+            <h3 class="project-card__title">Inverter Gate Driver</h3>
+            <p class="project-card__desc">Gate driver board for the traction inverter's power stage. Verified switching behaviour — turn-on/turn-off transitions and ringing — with double-pulse testing on the bench, and used SPICE simulation to estimate losses ahead of hardware validation.</p>
+            <div class="project-card__tags">
+              <span class="tag">Power Electronics</span>
+              <span class="tag">Gate Driver</span>
+              <span class="tag">Double-Pulse Testing</span>
+              <span class="tag">SPICE Simulation</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <img class="project-card__image" src="assets/images/projects/inverter-mcu-module.png" alt="Embedded C source code implementing a field-oriented control loop">
+          <div class="project-card__body">
+            <h3 class="project-card__title">Inverter MCU Module</h3>
+            <p class="project-card__desc">STM32-based control board for the traction inverter, running a field-oriented control loop — Clarke-Park transforms, decoupling, and PI current control — to drive the motor. Characterized analog input channels for linearity and noise, and worked through a structured bring-up list across power supply, CAN, encoder, and gate driver interfaces.</p>
+            <div class="project-card__tags">
+              <span class="tag">STM32</span>
+              <span class="tag">Field-Oriented Control</span>
+              <span class="tag">Embedded C</span>
+              <span class="tag">Hardware Bring-up</span>
+            </div>
+          </div>
+        </article>
+
       </div>
     </section>
   </main>
