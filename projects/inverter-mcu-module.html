@@ -89,6 +89,10 @@
           </tbody>
         </table>
       </div>
+      <figure class="schematic-figure">
+        <img src="../assets/images/projects/mcu-analog-input-test.jpg" alt="Spreadsheet, linear-fit plot, and oscilloscope capture used to compute the AIN2 gain, offset, R-squared, and RMS/absolute error values">
+        <figcaption>The AIN2 gain-error worksheet behind Table 6.1: every sample from the sawtooth sweep (bottom right, scope capture) logged into a spreadsheet and compared against its ideal value (top right, Vout vs. Vin) to compute gain, offset, R², and RMS/absolute error.</figcaption>
+      </figure>
       <p>Both channels passed the qualitative check, but the resulting RMS and absolute error were higher than would be desirable for a current/torque-relevant measurement — this hadn't been set as an explicit design target originally, so a quantitative error budget (RMS error below 0.2% FS, absolute error below 0.5% FS, linear fit above 0.9995) was defined after the fact as a target for the next hardware revision. The input filter's cutoff frequency was also measured lower than designed (≈170Hz measured vs. 420Hz target) — traced to the original calculation not accounting for the next stage's loading effect — and rather than reworking the filter hardware, the requirement itself was revised to the as-built 170Hz for this revision.</p>
 
       <h3>Phase current, DC-link, gate driver comms, encoder, resolver, temperature</h3>
@@ -118,6 +122,10 @@
       <p>A further architectural observation from this process: all of the ADC channels needed to run FOC are currently split across multiple ADC peripheral instances rather than grouped logically; regrouping phase current, resolver and temperature measurements onto three dedicated ADCs is suggested for the next revision to simplify synchronized sampling.</p>
 
       <h2>Software — field-oriented control</h2>
+      <figure class="schematic-figure">
+        <img src="../assets/images/projects/pmsm-foc-loop.jpg" alt="Block diagram of a field-oriented control scheme for a PMSM: an outer speed closed-loop feeding an inner torque closed-loop with dq/alpha-beta transforms, PI current regulators, SVPWM, inverter and PMSM feedback">
+        <figcaption>The general field-oriented control architecture this firmware is built around. The current implementation closes the inner torque loop (blue) — PI current regulation on the d- and q-axes, with the q-axis reference taken directly from the throttle input; the outer speed loop (red) is future work ahead of a closed-loop spin test.</figcaption>
+      </figure>
       <p>On the software side, a fixed-timing FOC loop runs at 32kHz directly from a timer update interrupt (twice the 16kHz PWM carrier frequency), with no branching on sensor values and no blocking calls anywhere in it — every input it needs (ADC samples, encoder count) has already been produced by DMA and hardware counters before the interrupt fires, so the whole loop fits deterministically inside its interrupt period. Each cycle: updates rotor angle/speed from the encoder, evaluates sine/cosine of the electrical angle via the CORDIC hardware accelerator, reads phase currents and DC-bus voltage, applies the Clarke and Park transforms, computes feed-forward decoupling, runs series-form PI current regulators (with anti-windup) on the d- and q-axis currents, applies the inverse Park transform, generates the three duty cycles via space-vector modulation with common-mode injection, and writes them directly into the PWM timer's registers. Driver bring-up (addressing, configuration, read-verify) and a FreeRTOS-based fault-handling task that watches the gate drivers' BREAK feedback round out the firmware.</p>
       <p>At this stage the algorithm runs open-loop against placeholder motor parameters — the hardware issues above (reverse-polarity protection, the DC-link amplifier's protection placement, the resolver amplifier, and the remaining untested paths) are what stand between this board and a closed-loop spin test with a characterized motor.</p>
     </section>
