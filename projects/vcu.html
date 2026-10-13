@@ -37,11 +37,62 @@
         <span class="tag">CAN Bus</span>
         <span class="tag">Hardware Bring-up</span>
       </div>
+      <div class="btn-row" style="justify-content: flex-start; margin-top: 1.5rem;">
+        <a class="btn btn--ghost" href="../assets/schematics/VCU-V1.0-Schematic.pdf" target="_blank" rel="noopener">View Schematic (PDF)</a>
+      </div>
     </header>
 
-    <!-- Write the full project detail below. Add photos with <img class="project-hero" src="../assets/images/projects/..."> as needed. -->
     <section class="project-detail__body">
-      <p><em>Full write-up coming soon.</em></p>
+      <h2>Overview</h2>
+      <p>The Vehicle Control Unit (VCU) is the car's main control PCB: it reads every sensor outside of the Tractive System Accumulator Container (TSAC) and sends the control signals to the inverters, the Ready-to-Drive (R2D) speaker, the water pumps, and the cooling fans. It is built around an STM32 H7 MCU and is powered from a single 12V input.</p>
+
+      <h3>Requirements</h3>
+      <ul>
+        <li>Single 12V power supply input</li>
+        <li>2 × CAN interfaces</li>
+        <li>IMU and EEPROM</li>
+        <li>5V regulated power output</li>
+        <li>8 × 12V high-side outputs, 4 × 12V low-side outputs</li>
+        <li>8 × 12V digital inputs, 4 × open-collector inputs</li>
+        <li>4 × 5V GPIO pins</li>
+        <li>8 × 5V analog voltage inputs, 6 × analog resistance inputs</li>
+        <li>2 × 5V analog outputs</li>
+      </ul>
+
+      <h2>Functional blocks</h2>
+
+      <h3>CAN</h3>
+      <p>Two independent CAN interfaces (main and auxiliary) are built around MCP2551 transceivers with ESD-protected bus lines. Each interface's RX/TX lines run through 0Ω link resistors rather than being hard-wired directly to the MCU, so if one CAN peripheral on the MCU fails, the two interfaces can be swapped in hardware by reflowing a resistor instead of changing the firmware.</p>
+
+      <h3>IMU</h3>
+      <p>An ICM-20948 IMU is connected over I2C, translated through a bidirectional level shifter between the sensor's 1.8V domain and the MCU's logic levels. A pull-up network sets the shifter's reference voltage so the translation works in both directions.</p>
+
+      <h3>EEPROM</h3>
+      <p>Non-volatile storage is provided by an M95P32 EEPROM connected over Quad-SPI, used for calibration data and offline event logging.</p>
+
+      <h3>Power supply</h3>
+      <p>The 12V input first passes through a protection stage (reverse-polarity and over-current), then feeds a chain of regulators producing the 5V, 5V<sub>AVCC</sub>, 3.3V, 3.3V<sub>AVCC</sub> and 1.8V rails the rest of the board needs. Two independently current-limited 1.25A 5V outputs are also provided for external loads, with the current limit set via a selectable resistor (the schematic includes a reference table of resistor values for common current limits).</p>
+
+      <h3>Digital I/O</h3>
+      <p>The digital I/O block covers five signal types: 12V high-side outputs (level-shifted 3.3V→12V signal outputs only, not intended to supply power — meant for PWM'ing the water pump/fans or an on/off signal to the R2D speaker), 12V low-side outputs (MOSFET switches to GND, for driving relay coils), 12V digital inputs (scaled down to 3.3V with an RC low-pass filter, e.g. for reading shutdown button states), open-collector inputs (a 12V pull-up that an open-collector sensor — like a front-wheel ABS sensor — can pull low), and 5V GPIO pins (configurable as input or output depending on which resistors are populated).</p>
+
+      <h3>Analog I/O</h3>
+      <p>Three analog sub-blocks are provided: 8 active analog inputs scaling a 5V signal down to the MCU's 3.3V range, 6 passive (resistive) inputs for sensors like NTC thermistors or suspension position sensors, and 2 DAC-driven 5V analog outputs — added for future-proofing, since controlling the inverters is preferred over CAN rather than an analog power request.</p>
+
+      <h2>Testbench and testing</h2>
+      <p>A dedicated testbench PCB and panel were built to exercise the VCU's I/O without needing the full car harness. It simulates every input and loads every tested output, split across clearly labelled, color-coded sections:</p>
+      <ul>
+        <li><strong>12V digital inputs</strong> — toggled with rocker switches</li>
+        <li><strong>Open-collector inputs</strong> — a small NE555-based PCB drives either a steady 0/1 or a selectable test frequency (500Hz, 1kHz, 1.5kHz, 2kHz)</li>
+        <li><strong>5V analog inputs</strong> — a potentiometer across a regulated 5V rail, buffered onto the VCU input</li>
+        <li><strong>Variable resistive inputs</strong> — a 50kΩ potentiometer to GND</li>
+        <li><strong>12V high/low-side outputs</strong> — 4mm banana plugs for direct multimeter verification, with a resistive dummy load on the low-side outputs to simulate a relay coil</li>
+        <li><strong>5V analog outputs</strong> — banana plugs for voltage verification</li>
+      </ul>
+      <p>CAN communication, the 5V regulated power outputs, and the IMU/EEPROM interfaces were deliberately left outside this testbench's scope — CAN is validated with a laptop connected directly to the D-Sub connectors instead.</p>
+
+      <h2>Known issues and planned improvements</h2>
+      <p>Before full testing, a few issues were already flagged from the design review: the CAN TVS diode footprints were undersized (0402, should be 0603 or larger), the EEPROM and IMU level-shifter footprints need correcting, and the power-supply protection stage should add transient protection alongside its existing steady-state protection. Further points noted for the next revision: accounting for CAN TVS capacitance against bus speed, re-calculating the fuse (a PPTC is preferred over a regular fuse), adding gate drivers for the 12V low-side MOSFETs with proper di/dt calculations, re-calculating the low-side MOSFETs' current rating, re-checking the digital-input RC filter values, and replacing the solder-configurable 5V GPIO block with a simple bi-directional level shifter so no rework is needed to change a pin's direction.</p>
     </section>
   </main>
 

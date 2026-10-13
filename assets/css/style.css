@@ -485,6 +485,107 @@ section.block { margin-bottom: 3rem; }
 .project-detail__body p { margin: 0 0 1rem; }
 .project-detail__body p:last-child { margin-bottom: 0; }
 
+.project-detail__body h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.project-detail__body h2:first-child { margin-top: 0; }
+
+.project-detail__body h3 {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--accent-2);
+  margin: 1.5rem 0 0.6rem;
+}
+
+.project-detail__body ul,
+.project-detail__body ol {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  color: var(--text);
+}
+
+.project-detail__body li { margin-bottom: 0.4rem; }
+
+.project-detail__body strong { color: var(--text); }
+
+.project-detail__body code {
+  font-family: var(--mono);
+  font-size: 0.88em;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 0.1em 0.35em;
+  border-radius: 0.25em;
+  color: var(--accent);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin: 0 0 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
+
+.project-detail__body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.project-detail__body th,
+.project-detail__body td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.project-detail__body thead th {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.project-detail__body tbody tr:last-child td { border-bottom: none; }
+
+.callout {
+  border-left: 3px solid var(--accent-2);
+  background: rgba(255, 180, 84, 0.06);
+  border-radius: 0.3rem;
+  padding: 0.8rem 1.1rem;
+  margin: 0 0 1.5rem;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
+.callout strong { color: var(--text); }
+
+.schematic-figure {
+  margin: 0 0 1.5rem;
+}
+
+.schematic-figure img {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.schematic-figure figcaption {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
 /* ---------- Footer ---------- */
 .footer {
   text-align: center;
