@@ -94,8 +94,16 @@ img { max-width: 100%; }
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
-  margin-top: 0.6rem;
+  /* No gap between this box and the li above it — the padding-top below
+     bridges the visual gap while keeping the hoverable box contiguous,
+     so moving the mouse slowly into the dropdown doesn't lose :hover. */
+  padding-top: 0.6rem;
   display: none;
+  z-index: 60;
+}
+
+.nav__dropdown-inner {
+  display: flex;
   flex-direction: column;
   min-width: 13rem;
   background: var(--bg-card);
@@ -103,13 +111,12 @@ img { max-width: 100%; }
   border-radius: 0.5rem;
   padding: 0.35rem;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
-  z-index: 60;
 }
 
 .nav__links li:hover .nav__dropdown,
 .nav__links li:focus-within .nav__dropdown,
 .nav__links li.is-open .nav__dropdown {
-  display: flex;
+  display: block;
 }
 
 .nav__dropdown a {

@@ -19,6 +19,10 @@
       var dropdown = document.createElement("div");
       dropdown.className = "nav__dropdown";
 
+      var inner = document.createElement("div");
+      inner.className = "nav__dropdown-inner";
+      dropdown.appendChild(inner);
+
       cards.forEach(function (card) {
         var titleEl = card.querySelector(".project-card__title");
         var href = card.getAttribute("href");
@@ -27,10 +31,10 @@
         var a = document.createElement("a");
         a.href = root + "/" + href;
         a.textContent = titleEl.textContent;
-        dropdown.appendChild(a);
+        inner.appendChild(a);
       });
 
-      if (!dropdown.children.length) return;
+      if (!inner.children.length) return;
       li.appendChild(dropdown);
 
       // Touch devices don't trigger :hover — tap to toggle instead.
